@@ -38,8 +38,9 @@ let isRecoveredLoading = false;
 
 // api
 function fetchCovidSummary() {
-  const url = 'https://api.covid19api.com/summary';
-  return axios.get(url);
+  const url = 'http://apis.data.go.kr/1352000/ODMS_COVID_04/callCovid04Api?serviceKey=';
+  const key = '9Ajz01IOELOw1Ybi16gqy4Cn%2B%2BM2Q5XlVfGGqBNjoeu2Hnix2aAGnbtGP4W56NaquGK77BpodFCodSQ4DGtbHg%3D%3D';
+  return axios.get(url + key + '&pageNo=1&numOfRows=10&gubun=합계');
 }
 
 function fetchCountryInfo(countryCode, status) {
@@ -159,11 +160,12 @@ function endLoadingAnimation() {
 
 async function setupData() {
   const { data } = await fetchCovidSummary();
-  setTotalConfirmedNumber(data);
-  setTotalDeathsByWorld(data);
-  setTotalRecoveredByWorld(data);
-  setCountryRanksByConfirmedCases(data);
-  setLastUpdatedTimestamp(data);
+  console.log('data', convertXmlToJson(data));
+  // setTotalConfirmedNumber(data);
+  // setTotalDeathsByWorld(data);
+  // setTotalRecoveredByWorld(data);
+  // setCountryRanksByConfirmedCases(data);
+  // setLastUpdatedTimestamp(data);
 }
 
 function renderChart(data, labels) {
@@ -239,5 +241,54 @@ function setCountryRanksByConfirmedCases(data) {
 function setLastUpdatedTimestamp(data) {
   lastUpdatedTime.innerText = new Date(data.Date).toLocaleString();
 }
+
+function convertXmlToJson(xml){
+  // Create a new DOMParser instance
+  const parser = new DOMParser();
+
+  // Parse the XML string
+  const xmlDoc = parser.parseFromString(xml, "text/xml");
+
+  // Convert the XML document to an object
+  const xmlObject = xmlToObj(xmlDoc.documentElement);
+
+  function xmlToObj(xmlElement) {
+    const obj = {};
+  
+    if (xmlElement.hasChildNodes()) {
+      for (let i = 0; i < xmlElement.childNodes.length; i++) {
+        const node = xmlElement.childNodes[i];
+  
+        if (node.nodeType === 1) {
+          if (node.hasChildNodes()) {
+            if (node.childNodes.length > 1 && node.childNodes[1].nodeName === node.childNodes[0].nodeName) {
+              if (!obj[node.nodeName]) {
+                obj[node.nodeName] = [];
+              }
+              obj[node.nodeName].push(xmlToObj(node));
+            } else {
+              const childObj = xmlToObj(node);
+              if (Object.keys(childObj).length > 0) {
+                if (!obj[node.nodeName]) {
+                  obj[node.nodeName] = [];
+                }
+                obj[node.nodeName].push(childObj);
+              } else {
+                obj[node.nodeName] = node.textContent;
+              }
+            }
+          } else {
+            obj[node.nodeName] = node.textContent;
+          }
+        }
+      }
+    }
+  
+    return obj;
+  }
+  return xmlObject.body[0].items[0].item;
+}
+
+
 
 startApp();
