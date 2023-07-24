@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    /**
+     * allowJs
+     * .tsx파일이 .js 파일과 함께 작동하도록 허용
+     * js를 점진적으로 ts로 변환할 때 사용
+     * 허용시 js도 `tsc`명령어에 서비스코드로 컴파일 됨
+     */
+    "allowJs": true,
+    /**
+     * target
+     * 어떤 문법으로 컴파일 할 지 설정
+     */
+    "target": "ES5",
+    /**
+     * outDir
+     * 타입스크립트 결과물이 저장될 위치 지정
+     * 지정한 위치에 폴더 생성 후 저장됨
+     */
+    "outDir": "./built",
+    /**
+     * moduleResolution
+     * Promise를 인식시키기 위해 Node 옵션 사용
+     */
+    "moduleResolution": "Node",
+    "lib": ["ES2015", "DOM", "DOM.Iterable"],
+    "noImplicitAny": true
+  },
+  /**
+   * include
+   * 프로젝트 기준으로 어떤 폴더의 파일을 컴파일 할 지 결정
+   * include 디폴트 값 : ["**\/*"] (실제는 \제거)
+   * exclude 디폴트 값 : [“node_modules”, “bower_components”, “jspm_packages”]
+   */
+  "include": ["./src/**/*"]
+}
